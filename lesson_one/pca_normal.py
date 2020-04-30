@@ -29,14 +29,15 @@ def PCA(data, correlation=False, sort=True):
     H = np.dot(X_aver,X_aver.T)
     #print("H\n",H)
 
-    eigenvalues, eigenvectors = np.linalg.eig(H) # column eigenvectors[:,i] is the eigenvector
+    #eigenvalues, eigenvectors = np.linalg.eig(H) # column eigenvectors[:,i] is the eigenvector
+    eigenvectors, eigenvalues, eigenvectors_t = np.linalg.svd(H) # column eigenvectors[:,i] is the eigenvector
     #print("eigenvalues", eigenvalues)
     #print(" eigenvectors", eigenvectors)
 
-    for i in range(len(eigenvectors)):
+    #for i in range(len(eigenvectors)):
         #print(eigenvectors[:, i])
         #print(eigenvectors[:, i].reshape(1, 3))
-        eigv = eigenvectors[:, i].reshape(1, 3).T
+        #eigv = eigenvectors[:, i].reshape(1, 3).T
         # a = H.dot(eigv)
         # b = eigv * eigenvalues[i]
         # c = a-b
@@ -73,12 +74,13 @@ def PCA2(A, correlation=False, sort=True):
     X_aver = A_aver.T
     H = np.dot(X_aver,X_aver.T)
 
-    eigenvalues, eigenvectors = np.linalg.eig(H) # column eigenvectors[:,i] is the eigenvector
+    #eigenvalues, eigenvectors = np.linalg.eig(H) # column eigenvectors[:,i] is the eigenvector
+    eigenvectors, eigenvalues, eigenvectors_t = np.linalg.svd(H) # column eigenvectors[:,i] is the eigenvector
 
-    for i in range(len(eigenvectors)):
+    #for i in range(len(eigenvectors)):
         #print(eigenvectors[:, i])
         #print(eigenvectors[:, i].reshape(1, 3))
-        eigv = eigenvectors[:, i].reshape(1, 3).T
+    #    eigv = eigenvectors[:, i].reshape(1, 3).T
  
     if sort:
         sort = eigenvalues.argsort()[::-1]
@@ -125,28 +127,36 @@ def process(filename):
     #o3d.visualization.draw_geometries([point_cloud_o3d])
     #print(type(point_cloud_o3d))
     #print(type([point_cloud_o3d]))
-
-    test_pcd = o3d.geometry.PointCloud()
-    datas = np.array(points)
-    pca_datas = np.dot(datas, point_cloud_vector);
-    #print(pca_datas)
-    #print(type([pca_datas][0][0]))
-    test_pcd.points = o3d.utility.Vector3dVector(pca_datas)  # 定义点云坐标位置
-
-    #o3d.visualization.draw_geometries([test_pcd])
+    direct_points =[[0, 0, 0], v[:,0], v[:,1]]
+    lines = [[0,1] , [0,2]]
+    colors =[[1,0,0], [0,1,0]]
+    line_set = o3d.geometry.LineSet(
+        points=o3d.utility.Vector3dVector(direct_points),
+        lines=o3d.utility.Vector2iVector(lines)
+    )
+    line_set.colors = o3d.utility.Vector3dVector(colors)
+    o3d.visualization.draw_geometries([point_cloud_o3d, line_set])
+    
+    # test_pcd = o3d.geometry.PointCloud()
+    # datas = np.array(points)
+    # pca_datas = np.dot(datas, point_cloud_vector);
+    # #print(pca_datas)
+    # #print(type([pca_datas][0][0]))
+    # test_pcd.points = o3d.utility.Vector3dVector(pca_datas)  # 定义点云坐标位置
+    # #o3d.visualization.draw_geometries([test_pcd])
 
     # 循环计算每个点的法向量
     pcd_tree = o3d.geometry.KDTreeFlann(point_cloud_o3d)
     normals = []
     # 作业2
     # 屏蔽开始
-
+    datas = np.array(point_cloud_pynt.points)
     for data in point_cloud_o3d.points:
         [k, idx, _] = pcd_tree.search_knn_vector_3d(data, 50)
         near_data = datas[np.array(idx)]
         near_eig_value, near_eig_vector = PCA2(points)
-        direct = near_eig_vector[:, 2]*0.2;  # 点云法方向对应的向量
-        normals.append(direct);
+        direct = near_eig_vector[:, 2]#*0.2;  # 点云法方向对应的向量
+        normals.append(direct)
 
     # 由于最近邻搜索是第二章的内容，所以此处允许直接调用open3d中的函数
 
