@@ -42,17 +42,23 @@ def voxel_filter(point_cloud, leaf_size):
     filtered_points = np.array(filtered_points, dtype=np.float64)
     return filtered_points
 
-def main():
-    # # 从ModelNet数据集文件夹中自动索引路径，加载点云
-    # cat_index = 10 # 物体编号，范围是0-39，即对应数据集中40个物体
-    # root_dir = '/Users/renqian/cloud_lesson/ModelNet40/ply_data_points' # 数据集路径
-    # cat = os.listdir(root_dir)
-    # filename = os.path.join(root_dir, cat[cat_index],'train', cat[cat_index]+'_0001.ply') # 默认使用第一个点云
-    # point_cloud_pynt = PyntCloud.from_file(file_name)
 
+def main(): 
+    # 指定点云路径
+    dir_index = 0 # 物体编号，范围是0-39，即对应数据集中40个物体/home/yhzhao/dataset/3D/3d_pcl/modelnet40_normal_resampled_ply/airplane/airplane_0002.ply
+    root_dir = '/home/yhzhao/dataset/3D/3d_pcl/modelnet40_normal_resampled_ply/' # 数据集路径
+    file_dirs = os.listdir(root_dir)
+
+    for fname in file_dirs:
+        filename = os.path.join(root_dir, fname, fname+'_0001.ply') # 默认使用第一个点云
+        print(filename)
+        process(filename)
+        
+
+def process(file_name): 
     # 加载自己的点云文件
     #file_name = "/Users/renqian/Downloads/program/cloud_data/11.ply"
-    file_name = "/home/yhzhao/dataset/3D/3d_pcl/modelnet40_normal_resampled_ply/airplane/airplane_0001.ply"
+    #file_name = "/home/yhzhao/dataset/3D/3d_pcl/modelnet40_normal_resampled_ply/airplane/airplane_0001.ply"
     point_cloud_pynt = PyntCloud.from_file(file_name)
 
     # 转成open3d能识别的格式
